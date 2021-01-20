@@ -1,7 +1,9 @@
 package entities;
 
 import org.json.simple.JSONObject;
-
+import strategies.EnergyChoiceStrategyType;
+import strategies.SelectProducersStrategy;
+import strategies.SelectProducersStrategyFactory;
 import utils.Constants;
 
 /**

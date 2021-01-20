@@ -8,6 +8,9 @@ import utils.Constants;
 
 import java.io.FileReader;
 
+/**
+ * The class processes basic information about the input file.
+ */
 @SuppressWarnings("deprecation")
 public final class InputLoader {
     /**
@@ -20,7 +23,8 @@ public final class InputLoader {
     }
 
     /**
-     * The method reads the input file
+     * The method reads the input file.
+     *
      * @return an Input object
      * @throws Exception in case of exceptions to reading
      */

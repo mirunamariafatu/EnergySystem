@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 /**
  * Class that contains general information about a consumer and
- * methods of processing its data
+ * methods of processing its data.
  */
 public final class Consumer extends Entity {
     /**
@@ -35,9 +35,14 @@ public final class Consumer extends Entity {
      * The unpaid distributor (if hasBorrowed == true)
      */
     private Distributor oldDistributor;
+    /**
+     * Consumer's current budget
+     */
+    private long budget;
 
     public Consumer(final long id, final long initialBudget, final long monthlyIncome) {
-        super(id, initialBudget);
+        super(id);
+        this.budget = initialBudget;
         this.monthlyIncome = monthlyIncome;
     }
 
@@ -47,6 +52,14 @@ public final class Consumer extends Entity {
 
     public void setCurrentContract(final Contract currentContract) {
         this.currentContract = currentContract;
+    }
+
+    public long getBudget() {
+        return budget;
+    }
+
+    public void setBudget(final long budget) {
+        this.budget = budget;
     }
 
     /**
@@ -60,6 +73,7 @@ public final class Consumer extends Entity {
         for (int i = 0; i < distributors.size(); i++) {
             if (!distributors.get(i).getIsBankrupt()) {
                 currentDistributor = distributors.get(i);
+
                 for (int j = i + 1; j < distributors.size(); j++) {
                     if (!distributors.get(j).getIsBankrupt()) {
                         if (distributors.get(j).getPrice() < currentDistributor.getPrice()) {
@@ -117,21 +131,48 @@ public final class Consumer extends Entity {
             // The consumer has unpaid payments from last month
             long totalPayment = Math.round(Math.floor(Constants.RATE * oldPayment))
                     + currentContract.getPrice();
-            if (this.getBudget() >= totalPayment) {
-                // Proceed with the payment
-                this.setBudget(this.getBudget() - totalPayment);
-                currentDistributor.setBudget(currentDistributor.getBudget()
-                        + currentContract.getPrice());
-                oldDistributor.setBudget(oldDistributor.getBudget()
-                        + Math.round(Math.floor(Constants.RATE * oldPayment)));
 
-                oldDistributor = null;
-                oldPayment = 0;
-                hasBorrowed = false;
+            // Proceed with the payment
+            if (currentDistributor.equals(oldDistributor)) {
+                if (this.getBudget() >= totalPayment) {
+                    this.setBudget(this.getBudget() - totalPayment);
+                    currentDistributor.setBudget(currentDistributor.getBudget()
+                            + currentContract.getPrice());
+                    oldDistributor.setBudget(oldDistributor.getBudget()
+                            + Math.round(Math.floor(Constants.RATE * oldPayment)));
+
+                    // The consumer has paid all his debts
+                    oldDistributor = null;
+                    oldPayment = 0;
+                    hasBorrowed = false;
+                } else {
+                    // The consumer has insufficient funds and as a result,
+                    // he will go bankrupt
+                    setIsBankrupt(true);
+                }
             } else {
-                // The consumer has insufficient funds and as a result,
-                // he will go bankrupt
-                setIsBankrupt(true);
+                if (this.getBudget() >= totalPayment - currentContract.getPrice()) {
+                    //  The distributor can only pay
+                    this.setBudget(this.getBudget() - (totalPayment - currentContract.getPrice()));
+                    if (this.getBudget() >= currentContract.getPrice()) {
+                        this.setBudget(this.getBudget() - currentContract.getPrice());
+
+                        // The consumer has paid all his debts
+                        oldDistributor = null;
+                        oldPayment = 0;
+                        hasBorrowed = false;
+                    } else {
+
+                        // The distributor has insufficient funds
+                        // to proceed his current contract price
+                        oldDistributor = currentDistributor;
+                        oldPayment = currentContract.getPrice();
+                    }
+                } else {
+                    // The consumer has insufficient funds and as a result,
+                    // he will go bankrupt
+                    setIsBankrupt(true);
+                }
             }
         }
 
