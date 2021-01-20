@@ -4,7 +4,7 @@ import entities.Consumer;
 
 /**
  * Class that contains general information about a contract and
- * methods of processing its data
+ * methods of processing its data.
  */
 public final class Contract {
     /**
@@ -61,7 +61,7 @@ public final class Contract {
     }
 
     /**
-     * Method that updates the remaining payment months
+     * Method that updates the remaining payment months.
      */
     public void contractUpdate() {
         remainedContractMonths -= 1;
