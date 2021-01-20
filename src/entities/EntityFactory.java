@@ -1,6 +1,7 @@
 package entities;
 
 import org.json.simple.JSONObject;
+
 import utils.Constants;
 
 /**
@@ -17,6 +18,7 @@ public final class EntityFactory {
 
     /**
      * Gets the instance.
+     *
      * @return the instance
      */
     public static EntityFactory getInstance() {
@@ -38,10 +40,10 @@ public final class EntityFactory {
     public Entity createEntity(final String entityType, final JSONObject entity) {
         Entity newEntity = null;
         long id = (long) entity.get(Constants.ID);
-        long initialBudget = (long) entity.get(Constants.INITIAL_BUDGET);
 
         switch (entityType) {
             case Constants.CONSUMER -> {
+                long initialBudget = (long) entity.get(Constants.INITIAL_BUDGET);
                 long monthlyIncome = (long) entity.get(Constants.MONTHLY_INCOME);
 
                 // Create new consumer (entity)
@@ -49,13 +51,34 @@ public final class EntityFactory {
             }
             case Constants.DISTRIBUTOR -> {
                 long contractLength = (long) entity.get(Constants.CONTRACT_LENGTH);
+                long initialBudget = (long) entity.get(Constants.INITIAL_BUDGET);
                 long initialInfrastructureCost =
                         (long) entity.get(Constants.INITIAL_INFRASTRUCTURE_COST);
-                long initialProductionCost = (long) entity.get(Constants.INITIAL_PRODUCTION_COST);
+                long energyNeeded = (long) entity.get(Constants.ENERGY_NEEDED_KW);
+                String strategyTitle = (String) entity.get(Constants.PRODUCER_STRATEGY);
+
+                SelectProducersStrategyFactory strategyFactory =
+                        SelectProducersStrategyFactory.getInstance();
+
+                EnergyChoiceStrategyType strategyType =
+                        EnergyChoiceStrategyType.valueOf(strategyTitle);
+                SelectProducersStrategy strategy = strategyFactory.createStrategy(strategyType);
 
                 // Create a new distributor (entity)
                 newEntity = new Distributor(id, initialBudget, contractLength,
-                        initialInfrastructureCost, initialProductionCost);
+                        initialInfrastructureCost, energyNeeded, strategyTitle, strategy);
+            }
+
+            case Constants.PRODUCER -> {
+                String energyTypeString = (String) entity.get(Constants.ENERGY_TYPE);
+                long maxDistributors = (long) entity.get(Constants.MAX_DISTRIBUTORS);
+                double priceKW = (double) entity.get(Constants.PRICE_KW);
+                long energyPerDistributor = (long) entity.get(Constants.ENERGY_PER_DISTRIBUTOR);
+                EnergyType energyType = EnergyType.valueOf(energyTypeString);
+
+                // Create a new producer (entity)
+                newEntity = new Producer(id, energyType, maxDistributors, priceKW,
+                        energyPerDistributor);
             }
             default -> System.out.println(Constants.INVALID_COMMAND);
         }
