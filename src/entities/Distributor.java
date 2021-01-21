@@ -43,6 +43,11 @@ public final class Distributor extends Entity implements Observer {
      */
     private long budget;
     /**
+     * Boolean flag which indicates whether
+     * the distributor is bankrupt or not.
+     */
+    private boolean isBankrupt = false;
+    /**
      * The amount of energy the distributor needs
      */
     private long energyNeededKW;
@@ -134,6 +139,14 @@ public final class Distributor extends Entity implements Observer {
         return currentProducers;
     }
 
+    public boolean getIsBankrupt() {
+        return isBankrupt;
+    }
+
+    public void setIsBankrupt(boolean bankrupt) {
+        isBankrupt = bankrupt;
+    }
+
     /**
      * Method that calculates distributor's profit.
      *
@@ -163,12 +176,9 @@ public final class Distributor extends Entity implements Observer {
      * Calculates current production cost.
      */
     public void calculateProductionCost() {
-        double cost = 0;
-
         // Compute the sum
-        for (Producer p : currentProducers) {
-            cost += p.getPriceKW() * p.getEnergyPerDistributor();
-        }
+        double cost = currentProducers.stream()
+                .mapToDouble(p -> p.getPriceKW() * p.getEnergyPerDistributor()).sum();
 
         productionCost = Math.round(Math.floor(cost / Constants.TEN_CONSTANT));
     }
@@ -193,9 +203,8 @@ public final class Distributor extends Entity implements Observer {
 
                 // Remove the distributor from his producers' active
                 // distributors
-                for (Producer p : this.getCurrentProducers()) {
-                    p.getAssignedDistributors().remove(this);
-                }
+                this.getCurrentProducers()
+                        .forEach(p -> p.getAssignedDistributors().remove(this));
             }
         }
     }
@@ -227,15 +236,12 @@ public final class Distributor extends Entity implements Observer {
     public void update(Observable o, Object producer) {
         // The producer that has updated its data
         Producer changedProducer = (Producer) producer;
-        for (Producer p : currentProducers) {
 
-            // Check if the changedProducer is assigned to
-            // the distributor's current producers
-            if (changedProducer.equals(p)) {
-                // Set the flag
-                this.hasToReapplyStrategy = true;
-                break;
-            }
+        // Check if the changedProducer is assigned to
+        // the distributor's current producers
+        if (currentProducers.stream().anyMatch(changedProducer::equals)) {
+            // Set the flag
+            this.hasToReapplyStrategy = true;
         }
     }
 }

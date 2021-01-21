@@ -10,6 +10,14 @@ import java.util.ArrayList;
  */
 public final class Producer extends Entity {
     /**
+     * Information about producer's monthly stats
+     */
+    private final ArrayList<MonthlyReport> reports;
+    /**
+     * Information about producer's current assigned distributors
+     */
+    private final ArrayList<Distributor> assignedDistributors;
+    /**
      * The type of energy produced
      */
     private EnergyType energyType;
@@ -25,14 +33,6 @@ public final class Producer extends Entity {
      * The amount of energy that the producer provides to a distributor
      */
     private long energyPerDistributor;
-    /**
-     * Information about producer's monthly stats
-     */
-    private final ArrayList<MonthlyReport> reports;
-    /**
-     * Information about producer's current assigned distributors
-     */
-    private final ArrayList<Distributor> assignedDistributors;
 
     public Producer(final long id, final EnergyType energyType, final long maxDistributors,
                     final double priceKW, final long energyPerDistributor) {

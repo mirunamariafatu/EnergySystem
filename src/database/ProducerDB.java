@@ -2,10 +2,12 @@ package database;
 
 import documents.MonthlyReport;
 import entities.Distributor;
+import entities.Entity;
 import entities.Producer;
 
 import java.util.ArrayList;
 import java.util.Observable;
+import java.util.stream.Collectors;
 
 /**
  * Information about all producers and methods of processing their data, retrieved
@@ -34,17 +36,15 @@ public final class ProducerDB extends Observable {
      */
     public void writeMonthlyReports(final int turn) {
         if (turn != 0) {
-            for (Producer p : producers) {
-                ArrayList<Long> getIds = new ArrayList<>();
-
+            producers.forEach(p -> {
                 // Get the ids of all his current distributors
-                for (Distributor d : p.getAssignedDistributors()) {
-                    getIds.add(d.getId());
-                }
+                ArrayList<Long> getIds = p.getAssignedDistributors().stream()
+                        .map(Entity::getId).collect(Collectors.toCollection(ArrayList::new));
+
                 // Create the report
                 MonthlyReport newReport = new MonthlyReport(turn, getIds);
                 p.getReports().add(newReport);
-            }
+            });
         }
     }
 
@@ -55,9 +55,7 @@ public final class ProducerDB extends Observable {
      * @param distributors information about all distributors
      */
     public void addAllObservers(final ArrayList<Distributor> distributors) {
-        for (Distributor d : distributors) {
-            addObserver(d);
-        }
+        distributors.forEach(this::addObserver);
     }
 
     /**

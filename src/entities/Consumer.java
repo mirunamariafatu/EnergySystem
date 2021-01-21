@@ -4,6 +4,7 @@ import documents.Contract;
 import utils.Constants;
 
 import java.util.ArrayList;
+import java.util.stream.IntStream;
 
 /**
  * Class that contains general information about a consumer and
@@ -39,6 +40,11 @@ public final class Consumer extends Entity {
      * Consumer's current budget
      */
     private long budget;
+    /**
+     * Boolean flag which indicates whether
+     * the consumer is bankrupt or not.
+     */
+    private boolean isBankrupt = false;
 
     public Consumer(final long id, final long initialBudget, final long monthlyIncome) {
         super(id);
@@ -62,6 +68,14 @@ public final class Consumer extends Entity {
         this.budget = budget;
     }
 
+    public boolean getIsBankrupt() {
+        return isBankrupt;
+    }
+
+    public void setIsBankrupt(boolean bankrupt) {
+        isBankrupt = bankrupt;
+    }
+
     /**
      * Method in which the consumer searches for a new distributor,
      * choosing the one with the lowest price available.
@@ -73,14 +87,11 @@ public final class Consumer extends Entity {
         for (int i = 0; i < distributors.size(); i++) {
             if (!distributors.get(i).getIsBankrupt()) {
                 currentDistributor = distributors.get(i);
+                IntStream.range(i + 1, distributors.size()).filter(j -> !distributors.get(j)
+                        .getIsBankrupt()).filter(j -> distributors
+                        .get(j).getPrice() < currentDistributor.getPrice())
+                        .forEach(j -> currentDistributor = distributors.get(j));
 
-                for (int j = i + 1; j < distributors.size(); j++) {
-                    if (!distributors.get(j).getIsBankrupt()) {
-                        if (distributors.get(j).getPrice() < currentDistributor.getPrice()) {
-                            currentDistributor = distributors.get(j);
-                        }
-                    }
-                }
                 return currentDistributor;
             }
         }

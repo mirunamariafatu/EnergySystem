@@ -31,41 +31,32 @@ public final class ConsumerDB {
      */
     public void searchForDistributors(final ArrayList<Distributor> distributors) {
         // Update the distributors' prices and production costs
-        for (Distributor d : distributors) {
+        distributors.forEach(d -> {
             d.calculateProductionCost();
             d.calculatePrice();
-        }
-        for (Consumer c : consumers) {
-            if ((c.getCurrentContract() == null) && (!c.getIsBankrupt())) {
-                // Get a new distributor
-                Distributor currentDistributor = c.chooseDistributor(distributors);
-                assert currentDistributor != null;
+        });
 
-                // Sign a new contract
-                c.signContract(currentDistributor);
-            }
-        }
+        consumers.stream().filter(c -> (c.getCurrentContract() == null) && (!c.getIsBankrupt()))
+                .forEach(c -> {
+                    // Get a new distributor
+                    Distributor currentDistributor = c.chooseDistributor(distributors);
+                    // Sign a new contract
+                    assert currentDistributor != null;
+                    c.signContract(currentDistributor);
+                });
     }
 
     /**
      * Method in which consumers collect their monthly salaries.
      */
     public void collectConsumersSalary() {
-        for (Consumer c : consumers) {
-            if (!c.getIsBankrupt()) {
-                c.getSalary();
-            }
-        }
+        consumers.stream().filter(c -> !c.getIsBankrupt()).forEach(Consumer::getSalary);
     }
 
     /**
      * Method in which consumers pay their current contract price.
      */
     public void payAllPrices() {
-        for (Consumer c : consumers) {
-            if (!c.getIsBankrupt()) {
-                c.payPrice();
-            }
-        }
+        consumers.stream().filter(c -> !c.getIsBankrupt()).forEach(Consumer::payPrice);
     }
 }

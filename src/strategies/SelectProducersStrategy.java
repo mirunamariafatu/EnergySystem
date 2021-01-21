@@ -16,7 +16,7 @@ public interface SelectProducersStrategy {
      * producers using a custom strategy.
      *
      * @param distributor current distributor
-     * @param producers information about all producers
+     * @param producers   information about all producers
      */
     void chooseProducers(Distributor distributor, ArrayList<Producer> producers);
 
