@@ -1,0 +1,155 @@
+*******************************************************************************
+                       ENERGY SYSTEM - Universiy Project
+                     Object-Oriented Programming 2020-2021
+
+                            Fatu Miruna-Maria 321CA
+*******************************************************************************
+Link GitHub: https://github.com/mirunamariafatu/EnergySystem.git
+
+    The program's main goal is to simulate an energetic system on which the 
+proper functioning of the entire country's economy depends.
+    The three main entities, consumers, distributors and producers have
+multiple attributions in this simulation, as will be seen in the implementation
+of the program.
+
+                 -------- ~ IMPLEMENTATION LOGIC ~ ---------
+
+The project is organised in six packages, each one having the following roles:
+
+    -> entities, which contains the following classes:
+
+        • EntityFactory
+                - class that implements Factory design pattern and can be
+                 instantiated only once; uses Singleton Pattern;
+                - contains a method which creates custom entities;
+
+        • Entity
+                - abstract class, which contains the default particularities
+                 of an entity: id
+
+        • Consumer
+               - inherits the Entity class;
+               - contains all the functionalities of a consumer: pays taxes,
+                signs a contract, looks for a distributor, collects monthly
+                income;
+
+        • Distributor
+                - inherits the Entity class;
+                - contains all the particularities and functionalities of
+                 a distributor: pays taxes, removes invalid clients/contracts;
+
+        • Producer
+                - inherits the Entity class;
+                - contains all the particularities of a producer and proper
+                functionalities as updating the amount of energy per 
+                distributor
+
+    -> documents, which contains the following classes:
+
+        • Contract
+                - contains all the particularities of a document: the owner
+                 of the contract, contract policies, and the validity of
+                 the contract;
+        
+        • Monthly Report (monthly stats)
+                - a balance sheet of a producer's data in which the active 
+                distributors of the producer are reported every month
+
+    -> databases, which contains the following classes:
+
+        • ConsumerDB & DistributorDB & ProducerDB
+                - databases containing all consumers/distributors' data that
+                 took part in the simulation;
+                - contains generic methods by which the database is
+                 constantly updated;
+    
+    -> strategies, which contains the following classes:
+
+        • SelectProducersStrategyFactory
+                - class that implements Factory design pattern and can be
+                 instantiated only once; uses Singleton Pattern;
+                - contains a method which creates custom strategies;
+                
+        • SelectProducersStrategy
+                - interface designed for Strategy design pattern
+                - implements a method by which distributors can 
+                choose their new producers using a costum strategy
+
+        • GreenStrategy & PriceStrategy & QuantityStrategy
+                - implements SelectProducersStrategy
+                - apply different sorting criteria on the producers' data so
+                that the distributors will choose them according to their 
+                preferred strategy
+
+    -> action
+    
+        • EnergySystem
+            - can be instantiated only once; uses Singleton Pattern;
+            - contains all the simulation logic and a method that runs the
+            simulation, putting together all the information processed
+            in the databases;
+
+    -> filesystem, the package deals with reading and writing input / output
+     files and contains the following classes:
+
+        • InputLoader
+               - parses the input file and read its data;
+        • Input
+               - process the data retrieved from input file, creating and
+               sorting the information into specific categories;
+        • OutputWriter
+               - writes the result to the output file;
+
+     •• Main class
+            - the entry-point to this project;
+
+                    ------------- ~ FLOW ~ --------------                                                                  ~ Package documents ~
+                                                                                                                        +-----------------------------+
+The simulation will take place for several months (rounds) during which the                                      -------| - Contract                  |
+three entities will bring their personal attributions.                            ~ Package entities ~           |      +-----------------------------+
+                                                                             +-----------------------------+     |   ---| - MonthlyReport             |
+                                                                             | - EntityFactory             |     |   |  +-----------------------------+
+                                                                             +-----------------------------+     |   |
+   ~ Package action ~                     ~ Package database ~               | - Entity  - abstract        |     |   |  
++-----------------------+              +-----------------------+             +-----------------------------+     |   |
+| - EnergySystem        |------------->| - ConsumersDB         | <-------    | - Consumer extends Entity   |------   |                     ~ Package strategies ~        
++-----------------------+        |     +-----------------------+             +-----------------------------+         |              +--------------------------------------+          
+                                 ----->| - ProducersDB         | <---------  | - Producer extends Entity   |----------              | - SelectProducersStrategyFactory     |
+                                 |     +-----------------------+             +-----------------------------+                        +--------------------------------------+        
+                                 ----->| - DistributorsDB      | <-----------| - Distributor extends Entity|-------------           | - SelectProducersStrategy - interface|
+                                       +-----------------------+             +-----------------------------+            |           +--------------------------------------+
+                                                                                                                        ------------| - GreenStrategy implements ..        |
+                                                                                                                        |           +--------------------------------------+
+                    ------------- ~ DESIGN ~ --------------                                                             ------------| - PriceStrategy implements ..        |
+                                                                                                                        |           +--------------------------------------+
+    --> Design Patterns <--                                                                                             ------------| - QuantityStrategy implements ..     |
+                                                                                                                                    +--------------------------------------+
+    Among the implementation of this project, four design patterns were used:
+Factory, Singleton, Strategy and Observer.
+
+     • Factory was used in the EntityFactory class and to generate specific
+    entities. Besides, the factory design pattern was used also in the 
+    SelectProducersStrategyFactory in which custom strategies are to be created
+
+     • The Singleton pattern was used to create the EnergySystem, EntityFactory
+    and SelectProducersStrategyFactory classes, as they will not have different
+    states during program run.
+
+    • Strategy Pattern, as a behavioral design pattern, was implemented using
+    SelectProducersStrategy interface due to the fact that there are multiple
+    "algorithms" for each way of choosing producers (by renewable energy, price
+    or the amount of energy).
+
+    • The Observer pattern is implemented in this simulation as the
+    producers' database is the subject which maintains a list of distributors,
+    called observers and notifies them automatically of any changes regarding
+    the amount of energy per distributor.
+
+    --> OOP Concepts <---
+
+    Also, OOP concepts were used, such as inheritance - the entity class is
+inherited by the consumer, distributor and producer - and encapsulation - the
+data within the classes is private, and can be accessed only through getters
+and setters.
+
+For further information, comments in the code should clarify any ambiguity.
