@@ -1,6 +1,7 @@
 package database;
 
 import entities.Distributor;
+import entities.Producer;
 
 import java.util.ArrayList;
 
@@ -23,12 +24,41 @@ public final class DistributorDB {
     }
 
     /**
-     * Method in which all distributors pay their monthly fees
+     * Method in which all distributors pay their monthly fees.
      */
     public void payAllTaxes() {
         for (Distributor d : distributors) {
             if (!d.getIsBankrupt()) {
                 d.payTaxes();
+            }
+        }
+    }
+
+    /**
+     * Method in which distributors choose new producers, using their
+     * particular strategy.
+     *
+     * @param producers producers' database
+     */
+    public void applyStrategyProducer(final ArrayList<Producer> producers) {
+        for (Distributor d : distributors) {
+            // Check if the distributor must choose new producers
+            if (d.getHasToReapplyStrategy()) {
+
+                // Check if distributor has current producers
+                if (!d.getCurrentProducers().isEmpty()) {
+
+                    // Remove the distributor from all its producers
+                    for (Producer p : d.getCurrentProducers()) {
+                        p.getAssignedDistributors().remove(d);
+                    }
+                    // Remove all current producers
+                    d.getCurrentProducers().clear();
+                }
+                // Distributor selects new producers
+                d.getStrategy().chooseProducers(d, producers);
+                // Reset the flag
+                d.setHasToReapplyStrategy(false);
             }
         }
     }
